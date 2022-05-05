@@ -2,6 +2,7 @@ from src.config.cognito_config import CognitoConfig
 from src.exception.generate_qr_code_exception import GenerateQRCodeException
 from src.exception.validate_qr_code_exception import ValidateQRCodeException
 from src.utils.mfa_validate_request import MFAValidateRequest
+import json
 
 
 class MFAService:
@@ -13,7 +14,10 @@ class MFAService:
 
     def obterQRCode(self):
         try:
-            header = self.event['headers']
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
 
             self.validation.validate_header_qr_code(header)
 
@@ -21,7 +25,7 @@ class MFAService:
                 Session=header['session']
             )
 
-            return {"codigo_qr_code": str(response['']), "session": str(response[''])}
+            return {"codigo_qr_code": response['SecretCode'], "session": response['Session']}
 
         except Exception as error:
             print(error)
@@ -30,16 +34,23 @@ class MFAService:
 
     def verifica(self):
         try:
-            header = self.event['headers']
-            body = self.event['body']
+            if (type(self.event['body']) == dict):
+                body = self.event['body']
+            else:
+                body = json.loads(self.event['body'])
+
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
 
             self.validation.validate_header_qr_code(header)
-            self.validation.validate_body_qr_code(header)
+            self.validation.validate_body_qr_code(body)
 
             self.connection.verify_software_token(
                 UserCode=body['user_code'],
                 Session=header['session'],
-                FriendlyDeviceName=['firendly_device_name']
+                FriendlyDeviceName=body['friendly_device_name']
             )
 
             return {"message": "Confirmação de criação de mfa para o usuário realizada com sucesso."}

@@ -1,6 +1,7 @@
 from src.config.cognito_config import CognitoConfig
 from src.exception.create_user_exception import CreateUserException
 from src.utils.cadastro_usuario_validate_request import CadastroUsuarioValidateRequest
+import json
 
 
 class CadastroUsuarioService:
@@ -12,7 +13,10 @@ class CadastroUsuarioService:
 
     def criar(self):
         try:
-            body = self.event['body']
+            if (type(self.event['body']) == dict):
+                body = self.event['body']
+            else:
+                body = json.loads(self.event['body'])
 
             self.validation.validate_body(body)
 

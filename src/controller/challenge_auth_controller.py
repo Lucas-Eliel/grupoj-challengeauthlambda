@@ -1,6 +1,8 @@
+import logging
 from http import HTTPStatus
 
 from src.exception.validation_request_exception import ValidationRequestException
+from src.exception.validation_token_exception import ValidationTokenException
 from src.service.cadastro_usuario_service import CadastroUsuarioService
 from src.service.confirmacao_usuario_service import ConfirmacaoUsuarioService
 from src.service.login_service import LoginService
@@ -32,14 +34,14 @@ class ChallengeAuthController:
                 raise ValidationRequestException("Método HTTP inválido")
 
             if self.event['resource'] == '/mfa_qr_code':
-                if self.event['httpMethod'] == 'POST':
+                if self.event['httpMethod'] == 'GET':
                     result = self.service_mfa.obterQRCode()
                     return ResponseUtils.sucess(HTTPStatus.CREATED, result)
                 raise ValidationRequestException("Método HTTP inválido")
 
             if self.event['resource'] == '/mfa_qr_code_confirmacao':
                 if self.event['httpMethod'] == 'POST':
-                    result = self.service_confirmacao_usuario.confirmar()
+                    result = self.service_mfa.verifica()
                     return ResponseUtils.sucess(HTTPStatus.CREATED, result)
                 raise ValidationRequestException("Método HTTP inválido")
 
@@ -71,6 +73,9 @@ class ChallengeAuthController:
 
         except ValidationRequestException as error:
             return ResponseUtils.error(HTTPStatus.BAD_REQUEST, error.message)
+
+        except ValidationTokenException as error:
+            return ResponseUtils.error(HTTPStatus.FORBIDDEN, error.message)
 
         except Exception as error:
             return ResponseUtils.error(HTTPStatus.INTERNAL_SERVER_ERROR, str(error))

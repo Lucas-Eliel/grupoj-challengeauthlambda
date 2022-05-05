@@ -22,8 +22,7 @@ services:
     volumes:
       - ./data:/tmp/localstack
       - ./bin:/docker-entrypoint-initaws.d
-      - /Users/lucaseliel/Documents/projects/grupoj-ocrcupomcommand:/lambda_folder_ocrcupomcommand
-      - /Users/lucaseliel/Documents/projects/grupoj-ocrcupomquery:/lambda_folder_ocrcupomquery
+      - ../../:/lambda_folder
       - ./output:/output
 
 networks:

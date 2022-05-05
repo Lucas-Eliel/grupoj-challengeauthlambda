@@ -1,6 +1,7 @@
 from src.config.cognito_config import CognitoConfig
 from src.exception.confirmation_user_exception import ConfirmationUserException
 from src.utils.confirmacao_usuario_validate_request import ConfirmacaoUsuarioValidateRequest
+import json
 
 
 class ConfirmacaoUsuarioService:
@@ -12,7 +13,10 @@ class ConfirmacaoUsuarioService:
 
     def confirmar(self):
         try:
-            body = self.event['body']
+            if (type(self.event['body']) == dict):
+                body = self.event['body']
+            else:
+                body = json.loads(self.event['body'])
 
             self.validation.validate_body(body)
 

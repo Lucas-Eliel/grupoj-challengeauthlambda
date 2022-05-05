@@ -1,13 +1,16 @@
+import json
 import time
 
 import requests
 from envs import env
 from jose import jwt, jwk
 from jose.utils import base64url_decode
+import logging
 
 from src.config.cognito_config import CognitoConfig
 from src.exception.login_exception import LoginException
 from src.exception.logout_exception import LogoutException
+from src.exception.validation_token_exception import ValidationTokenException
 from src.utils.login_validate_request import LoginValidateRequest
 
 
@@ -20,8 +23,15 @@ class LoginService:
 
     def sign_in(self):
         try:
-            body = self.event['body']
-            header = self.event['headers']
+            if (type(self.event['body']) == dict):
+                body = self.event['body']
+            else:
+                body = json.loads(self.event['body'])
+
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
 
             self.validation.validate_header_login(header)
             self.validation.validate_body_login(body)
@@ -35,7 +45,12 @@ class LoginService:
                 ClientId=header['client_id']
             )
 
-            return {"message": "Necessário validar o MFA para prosseguir", "session": response['Session']}
+            if response['ChallengeName'] == 'MFA_SETUP':
+                return {"message": "Necessário cadastrar um MFA para prosseguir", "session": response['Session']}
+            if response['ChallengeName'] == 'SOFTWARE_TOKEN_MFA':
+                return {"message": "Necessário validar o MFA para prosseguir", "session": response['Session']}
+
+            return {"message": "Recurso não mapeado para o MFA"}
 
         except Exception as error:
             print(error)
@@ -43,8 +58,15 @@ class LoginService:
 
     def validateMFA(self):
         try:
-            header = self.event['headers']
-            body = self.event['body']
+            if (type(self.event['body']) == dict):
+                body = self.event['body']
+            else:
+                body = json.loads(self.event['body'])
+
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
 
             self.validation.validate_header_mfa(header)
             self.validation.validate_body_mfa(body)
@@ -67,29 +89,38 @@ class LoginService:
 
     def sign_out(self):
         try:
-            header = self.event['header']
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
 
             self.validation.validate_header_logout(header)
 
-            return self.connection.global_sign_out(
-                AccessToken=header['Authorization']
+            self.connection.global_sign_out(
+                AccessToken=header['authorization']
             )
+
+            return {"message": "Logout realizado com sucesso"}
+
         except Exception as error:
             print(error)
             raise LogoutException("Erro ao realizar logout para o usuário " + str(error))
 
     def validation_token(self):
         try:
-            header = self.event['headers']
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
 
-            self.validation.validate_body_validation_token(header)
+            self.validation.validate_header_validation_token(header)
 
-            token = header['Authorization']
+            token = header['authorization']
             app_client_id = header['client_id']
 
             if not self.obter_usuario(token):
                 print('Token was rovoked')
-                return False
+                raise Exception("Acesso não autorizado")
 
             keys = self.get_keys().get('keys')
 
@@ -104,7 +135,7 @@ class LoginService:
                     break
             if key_index == -1:
                 print('Public key not found in jwks.json')
-                return False
+                raise Exception("Acesso não autorizado")
             # construct the public key
             public_key = jwk.construct(keys[key_index])
             # get the last two sections of the token,
@@ -115,7 +146,7 @@ class LoginService:
             # verify the signature
             if not public_key.verify(message.encode("utf8"), decoded_signature):
                 print('Signature verification failed')
-                return False
+                raise Exception("Acesso não autorizado")
             print('Signature successfully verified')
             # since we passed the verification, we can now safely
             # use the unverified claims
@@ -123,16 +154,19 @@ class LoginService:
             # additionally we can verify the token expiration
             if time.time() > claims['exp']:
                 print('Token is expired')
-                return False
+                raise Exception("Token Expirado")
             # and the Audience  (use claims['client_id'] if verifying an access token)
             if claims['client_id'] != app_client_id:
                 print('Token was not issued for this audience')
-                return False
+                raise Exception("Acesso não autorizado")
             # now we can use the claims
             print(claims)
-            return True
+
+            return {"message": "Acesso autorizado"}
+
         except Exception as error:
             print(error)
+            raise ValidationTokenException(str(error))
 
     def obter_usuario(self, access_token):
         try:
