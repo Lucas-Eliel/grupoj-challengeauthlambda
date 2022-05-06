@@ -5,12 +5,12 @@ import requests
 from envs import env
 from jose import jwt, jwk
 from jose.utils import base64url_decode
-import logging
 
 from src.config.cognito_config import CognitoConfig
 from src.exception.login_exception import LoginException
 from src.exception.logout_exception import LogoutException
 from src.exception.validation_token_exception import ValidationTokenException
+from src.repository.redis_repository import RedisRepository
 from src.utils.login_validate_request import LoginValidateRequest
 
 
@@ -19,6 +19,7 @@ class LoginService:
     def __init__(self, event):
         self.event = event
         self.connection = CognitoConfig().get_connection_cognito()
+        self.repository = RedisRepository()
         self.validation = LoginValidateRequest()
 
     def sign_in(self):
@@ -35,6 +36,10 @@ class LoginService:
 
             self.validation.validate_header_login(header)
             self.validation.validate_body_login(body)
+
+            numero_tentativas_byte = self.repository.get(body['username'])
+            if numero_tentativas_byte is not None and int.from_bytes(numero_tentativas_byte, "little") == 3:
+                raise Exception("Número de tentativas excedido")
 
             response = self.connection.initiate_auth(
                 AuthFlow='USER_PASSWORD_AUTH',
@@ -54,7 +59,18 @@ class LoginService:
 
         except Exception as error:
             print(error)
-            raise LoginException("Não foi possível realizar o login " + str(error))
+            numero_tentativas_acumulada_byte = self.repository.get(body['username'])
+
+            if numero_tentativas_acumulada_byte is not None:
+                numero_tentativas_acumulada = int.from_bytes(numero_tentativas_acumulada_byte, "little")
+                numero_tentativas_acumulada += 1
+                if numero_tentativas_acumulada <= 3:
+                    self.repository.save(body['username'], numero_tentativas_acumulada.to_bytes(2, "little"))
+            else:
+                numero_tentativas_acumulada = 1
+                self.repository.save(body['username'], numero_tentativas_acumulada.to_bytes(2, "little"))
+
+            raise LoginException("Não foi possível realizar o login: " + str(error))
 
     def validateMFA(self):
         try:
@@ -193,3 +209,18 @@ class LoginService:
                     'us-east-1', 'us-east-1_dIRX8NWV2'
                 )).json()
             return self.pool_jwk
+
+
+if __name__ == '__main__':
+    num = 5
+
+    resposta = num.to_bytes(2, "little")
+
+    print(resposta)
+
+if __name__ == '__main__':
+    byte = b'\x05\x00'
+
+    resposta = int.from_bytes(byte, "little")
+
+    print(resposta)
