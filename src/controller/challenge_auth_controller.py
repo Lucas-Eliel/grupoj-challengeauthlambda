@@ -1,10 +1,17 @@
-import logging
 from http import HTTPStatus
 
+from src.exception.confirmation_user_exception import ConfirmationUserException
+from src.exception.create_user_exception import CreateUserException
+from src.exception.forgot_password_exception import ForgotPasswordException
+from src.exception.generate_qr_code_exception import GenerateQRCodeException
+from src.exception.login_exception import LoginException
+from src.exception.logout_exception import LogoutException
+from src.exception.validate_qr_code_exception import ValidateQRCodeException
 from src.exception.validation_request_exception import ValidationRequestException
 from src.exception.validation_token_exception import ValidationTokenException
 from src.service.cadastro_usuario_service import CadastroUsuarioService
 from src.service.confirmacao_usuario_service import ConfirmacaoUsuarioService
+from src.service.esqueceu_senha_service import ForgotPasswordService
 from src.service.login_service import LoginService
 from src.service.mfa_service import MFAService
 from src.utils.response_utils import ResponseUtils
@@ -18,6 +25,7 @@ class ChallengeAuthController:
         self.service_confirmacao_usuario = ConfirmacaoUsuarioService(event)
         self.service_mfa = MFAService(event)
         self.service_login = LoginService(event)
+        self.service_forgot = ForgotPasswordService(event)
 
     def invoke(self):
         try:
@@ -63,15 +71,28 @@ class ChallengeAuthController:
                     return ResponseUtils.sucess(HTTPStatus.CREATED, result)
                 raise ValidationRequestException("Método HTTP inválido")
 
-            if self.event['resource'] == '/signout':
+            if self.event['resource'] == '/sign_out':
                 if self.event['httpMethod'] == 'POST':
                     result = self.service_login.sign_out()
                     return ResponseUtils.sucess(HTTPStatus.CREATED, result)
                 raise ValidationRequestException("Método HTTP inválido")
 
+            if self.event['resource'] == '/forgot_password':
+                if self.event['httpMethod'] == 'POST':
+                    result = self.service_forgot.forgot_password()
+                    return ResponseUtils.sucess(HTTPStatus.CREATED, result)
+                raise ValidationRequestException("Método HTTP inválido")
+
+            if self.event['resource'] == '/confirmation_forgot_password':
+                if self.event['httpMethod'] == 'POST':
+                    result = self.service_forgot.confirm_forgot_password()
+                    return ResponseUtils.sucess(HTTPStatus.CREATED, result)
+                raise ValidationRequestException("Método HTTP inválido")
+
             raise ValidationRequestException("Endpoint inválido")
 
-        except ValidationRequestException as error:
+        except (CreateUserException, ConfirmationUserException, ForgotPasswordException, LoginException, LogoutException,
+                ValidationRequestException, GenerateQRCodeException, ValidateQRCodeException) as error:
             return ResponseUtils.error(HTTPStatus.BAD_REQUEST, error.message)
 
         except ValidationTokenException as error:

@@ -4,9 +4,6 @@ from src.exception.validation_request_exception import ValidationRequestExceptio
 class CadastroUsuarioValidateRequest:
 
     def validate_body(self, body):
-        if not 'client_id' in body:
-            raise ValidationRequestException("Necessário informar o client_id no body da request")
-
         if not 'username' in body:
             raise ValidationRequestException("Necessário informar o username no body da request")
 
@@ -33,3 +30,7 @@ class CadastroUsuarioValidateRequest:
 
         if not 'address' in body['attributes']:
             raise ValidationRequestException("Necessário informar o address para attributes no body da request")
+
+    def validate_header(self, header):
+        if not 'client_id' in header:
+            raise ValidationRequestException("Necessário informar o client_id no header da request")

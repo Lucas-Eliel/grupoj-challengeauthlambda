@@ -31,7 +31,6 @@ class MFAService:
             print(error)
             raise GenerateQRCodeException("Erro ao gerar o codigo válido para o QRCode " + str(error))
 
-
     def verifica(self):
         try:
             if (type(self.event['body']) == dict):

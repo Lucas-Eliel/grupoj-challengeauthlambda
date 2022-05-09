@@ -18,10 +18,16 @@ class ConfirmacaoUsuarioService:
             else:
                 body = json.loads(self.event['body'])
 
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
+
             self.validation.validate_body(body)
+            self.validation.validate_header(header)
 
             self.connection.confirm_sign_up(
-                ClientId=body['client_id'],
+                ClientId=header['client_id'],
                 Username=body['username'],
                 ConfirmationCode=body['confirmation_code']
             )

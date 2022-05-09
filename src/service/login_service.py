@@ -209,18 +209,3 @@ class LoginService:
                     'us-east-1', 'us-east-1_dIRX8NWV2'
                 )).json()
             return self.pool_jwk
-
-
-if __name__ == '__main__':
-    num = 5
-
-    resposta = num.to_bytes(2, "little")
-
-    print(resposta)
-
-if __name__ == '__main__':
-    byte = b'\x05\x00'
-
-    resposta = int.from_bytes(byte, "little")
-
-    print(resposta)

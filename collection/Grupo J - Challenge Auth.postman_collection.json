@@ -12,10 +12,16 @@
 					"name": "Cria usuário",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "client_id",
+								"value": "20tfh1piiu8pja1khmjuve6ra0",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"client_id\": \"20tfh1piiu8pja1khmjuve6ra0\",\n    \"username\": \"lucaseliel.study@gmail.com\",\n    \"password\": \"Abc@123\",\n    \"attributes\": {\n        \"name\": \"Joao\",\n        \"middle_name\": \"Souza\",\n        \"email\": \"lucaseliel.study@gmail.com\",\n        \"locale\": \"Brasil\",\n        \"phone_number\": \"+15555555555\",\n        \"address\": \"Rua Alfa\"\n    }\n}",
+							"raw": "{\n    \"username\": \"lucaseliel.study@gmail.com\",\n    \"password\": \"Abc@123\",\n    \"attributes\": {\n        \"name\": \"Joao\",\n        \"middle_name\": \"Souza\",\n        \"email\": \"lucaseliel.study@gmail.com\",\n        \"locale\": \"Brasil\",\n        \"phone_number\": \"+15555555555\",\n        \"address\": \"Rua Alfa\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -23,7 +29,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4566/restapis/1rpivdgd18/test/_user_request_/usuario",
+							"raw": "http://localhost:4566/restapis/{{gateway_id}}/test/_user_request_/usuario",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -31,7 +37,7 @@
 							"port": "4566",
 							"path": [
 								"restapis",
-								"1rpivdgd18",
+								"{{gateway_id}}",
 								"test",
 								"_user_request_",
 								"usuario"
@@ -44,10 +50,16 @@
 					"name": "Confirma cadastro usuário",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "client_id",
+								"value": "20tfh1piiu8pja1khmjuve6ra0",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"client_id\": \"20tfh1piiu8pja1khmjuve6ra0\",\n    \"username\": \"lucaseliel.study@gmail.com\",\n    \"confirmation_code\": \"3212113\"\n}",
+							"raw": "{\n    \"username\": \"lucaseliel.study@gmail.com\",\n    \"confirmation_code\": \"197240\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -55,7 +67,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4566/restapis/1rpivdgd18/test/_user_request_/usuario_confirmacao",
+							"raw": "http://localhost:4566/restapis/{{gateway_id}}/test/_user_request_/usuario_confirmacao",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -63,7 +75,7 @@
 							"port": "4566",
 							"path": [
 								"restapis",
-								"1rpivdgd18",
+								"{{gateway_id}}",
 								"test",
 								"_user_request_",
 								"usuario_confirmacao"
@@ -237,13 +249,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "",
+								"value": "eyJraWQiOiJ6cmtkZlpkVWdxVnRmR2UzZWZUNU5RdU9vaXZjejF2aFwvN1wvYm5PQlNjVGM9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiIxNTgwZDUxZC1lZTFjLTQwYWUtYTNmYi0wN2EwODY5N2M5ZGIiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9kSVJYOE5XVjIiLCJjbGllbnRfaWQiOiIyMHRmaDFwaWl1OHBqYTFraG1qdXZlNnJhMCIsIm9yaWdpbl9qdGkiOiJmNDc1ZjRmZi1kOGYzLTQwN2UtYWI4Zi03MjQ1Yjk5YzI5ODYiLCJldmVudF9pZCI6ImY2NDE0MDczLWI2MGItNDlmZi04MDgxLTY4YjQ5Y2MxMjdlMyIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE2NTE3OTM1MzAsImV4cCI6MTY1MTc5NzEzMCwiaWF0IjoxNjUxNzkzNTMwLCJqdGkiOiIyY2M1MTNiNC0zYmY2LTRhYTktOTA4ZC0xMmQyMGE0ZTU5NjIiLCJ1c2VybmFtZSI6IjE1ODBkNTFkLWVlMWMtNDBhZS1hM2ZiLTA3YTA4Njk3YzlkYiJ9.rWPrkYfg6SVZY3uBiUMT9uer64_rH46GioZLIIuGlTnYHn9qveLkWRGJAPUQt-kbLIfHRNz_pSM1gVmVBtRKx0RpR6bjjmekLB6IvWjlzqD1ctZtinV2_G4NP7rMampH5sEG0sNLYWrdezYTD_wer51OdOoK7uRX9a231UgCO7Ayyg00hSxYGcAPPmg9X4dU4GOFpt4Ixhp03kbmaD3brS748yPIp-MBQjDj54c0xo9qsOte_kJMumONtDiAvAMUtxaj4AvNIeiE5KSEF6-xsBkae4LG2z1rbTSTNbKraCSNaZKFK79pN0yoN7IzxiuFkk04dU5-qIeTucY0jd56WA",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"lucaseliel.study@gmail.com\",\n    \"software_token_mfa_code\": \"55123\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -251,7 +263,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4566/restapis/jtq23gt68b/test/_user_request_/signout",
+							"raw": "http://localhost:4566/restapis/{{gateway_id}}/test/_user_request_/sign_out",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -259,10 +271,10 @@
 							"port": "4566",
 							"path": [
 								"restapis",
-								"jtq23gt68b",
+								"{{gateway_id}}",
 								"test",
 								"_user_request_",
-								"signout"
+								"sign_out"
 							]
 						}
 					},
@@ -306,6 +318,87 @@
 								"test",
 								"_user_request_",
 								"validation_token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Esqueceu Senha",
+			"item": [
+				{
+					"name": "Esqueceu a senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "client_id",
+								"value": "20tfh1piiu8pja1khmjuve6ra0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"lucaseliel.study@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4566/restapis/jtq23gt68b/test/_user_request_/validate_mfa",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4566",
+							"path": [
+								"restapis",
+								"jtq23gt68b",
+								"test",
+								"_user_request_",
+								"validate_mfa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirma Esqueceu a senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "client_id",
+								"value": "20tfh1piiu8pja1khmjuve6ra0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"lucaseliel.study@gmail.com\",\n    \"confirmation_code\": \"55123\",\n    \"password\": \"123@Abc\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4566/restapis/{{gateway_id}}/test/_user_request_/confirmation_forgot_password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4566",
+							"path": [
+								"restapis",
+								"{{gateway_id}}",
+								"test",
+								"_user_request_",
+								"confirmation_forgot_password"
 							]
 						}
 					},

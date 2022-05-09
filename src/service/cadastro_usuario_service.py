@@ -1,7 +1,8 @@
+import json
+
 from src.config.cognito_config import CognitoConfig
 from src.exception.create_user_exception import CreateUserException
 from src.utils.cadastro_usuario_validate_request import CadastroUsuarioValidateRequest
-import json
 
 
 class CadastroUsuarioService:
@@ -18,10 +19,16 @@ class CadastroUsuarioService:
             else:
                 body = json.loads(self.event['body'])
 
+            if (type(self.event['headers']) == dict):
+                header = self.event['headers']
+            else:
+                header = json.loads(self.event['headers'])
+
             self.validation.validate_body(body)
+            self.validation.validate_header(header)
 
             self.connection.sign_up(
-                ClientId=body['client_id'],
+                ClientId=header['client_id'],
                 Username=body['username'],
                 Password=body['password'],
                 UserAttributes=[

@@ -74,7 +74,17 @@ awslocal apigateway create-resource \
 awslocal apigateway create-resource \
     --rest-api-id ${API_ID} \
     --parent-id ${PARENT_RESOURCE_ID} \
-    --path-part "signout"
+    --path-part "sign_out"
+
+awslocal apigateway create-resource \
+    --rest-api-id ${API_ID} \
+    --parent-id ${PARENT_RESOURCE_ID} \
+    --path-part "forgot_password"
+
+awslocal apigateway create-resource \
+    --rest-api-id ${API_ID} \
+    --parent-id ${PARENT_RESOURCE_ID} \
+    --path-part "confirmation_forgot_password"
 
 echo ---------------------------------------------------------------------------------------------------
 echo ---------------------Criando recurso do grupoj-challengeauthlambda API Gateway---------------------
@@ -241,7 +251,7 @@ awslocal apigateway put-integration \
     --passthrough-behavior WHEN_NO_MATCH \
 
 
-RESOURCE_ID_8=$(awslocal apigateway get-resources --rest-api-id ${API_ID} --query 'items[?path==`/signout`].id' --output text)
+RESOURCE_ID_8=$(awslocal apigateway get-resources --rest-api-id ${API_ID} --query 'items[?path==`/sign_out`].id' --output text)
 echo RESOURCE_ID_8 ${RESOURCE_ID_8}
 
 [ $? == 0 ] || fail 5 "Failed: AWS / apigateway / put-integration"
@@ -257,6 +267,52 @@ awslocal apigateway put-method \
 awslocal apigateway put-integration \
     --rest-api-id ${API_ID} \
     --resource-id ${RESOURCE_ID_8} \
+    --http-method POST \
+    --type AWS_PROXY \
+    --integration-http-method POST \
+    --uri arn:aws:apigateway:sa-east-1:lambda:path/2015-03-31/functions/${LAMBDA_CHALLENGE_AUTH_ARN}/invocations \
+    --passthrough-behavior WHEN_NO_MATCH \
+
+
+RESOURCE_ID_9=$(awslocal apigateway get-resources --rest-api-id ${API_ID} --query 'items[?path==`/forgot_password`].id' --output text)
+echo RESOURCE_ID_9 ${RESOURCE_ID_9}
+
+[ $? == 0 ] || fail 5 "Failed: AWS / apigateway / put-integration"
+
+awslocal apigateway put-method \
+    --rest-api-id ${API_ID} \
+    --resource-id ${RESOURCE_ID_9} \
+    --http-method POST \
+    --authorization-type "NONE" \
+
+[ $? == 0 ] || fail 6 "Failed: AWS / apigateway / put-method"
+
+awslocal apigateway put-integration \
+    --rest-api-id ${API_ID} \
+    --resource-id ${RESOURCE_ID_9} \
+    --http-method POST \
+    --type AWS_PROXY \
+    --integration-http-method POST \
+    --uri arn:aws:apigateway:sa-east-1:lambda:path/2015-03-31/functions/${LAMBDA_CHALLENGE_AUTH_ARN}/invocations \
+    --passthrough-behavior WHEN_NO_MATCH \
+
+
+RESOURCE_ID_10=$(awslocal apigateway get-resources --rest-api-id ${API_ID} --query 'items[?path==`/confirmation_forgot_password`].id' --output text)
+echo RESOURCE_ID_10 ${RESOURCE_ID_10}
+
+[ $? == 0 ] || fail 5 "Failed: AWS / apigateway / put-integration"
+
+awslocal apigateway put-method \
+    --rest-api-id ${API_ID} \
+    --resource-id ${RESOURCE_ID_10} \
+    --http-method POST \
+    --authorization-type "NONE" \
+
+[ $? == 0 ] || fail 6 "Failed: AWS / apigateway / put-method"
+
+awslocal apigateway put-integration \
+    --rest-api-id ${API_ID} \
+    --resource-id ${RESOURCE_ID_10} \
     --http-method POST \
     --type AWS_PROXY \
     --integration-http-method POST \
