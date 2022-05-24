@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo Encerrando a infraestrutura do projeto ocr cupom
+echo Encerrando a infraestrutura do projeto challenge auth lambda
 
 rm -R  ../redis
 rm -R  ../packaging

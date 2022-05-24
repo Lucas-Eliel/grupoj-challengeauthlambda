@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo Iniciando a infraestrutura do projeto ocr cupom
+echo Iniciando a infraestrutura do projeto challenge auth lambda
 
 cp -R ./localstack/lambda/libs/ ../
 
